@@ -1,0 +1,17 @@
+# Temporales de Office
+~$*
+*.tmp
+*.bak
+
+# Sistema operativo
+Thumbs.db
+desktop.ini
+.DS_Store
+
+# Dependencias de Node
+node_modules/
+
+# Variables de entorno (credenciales)
+.env
+.env.*
+!.env.example
