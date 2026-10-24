@@ -420,9 +420,9 @@ NODE_ENV=development
 
 ## 12. Prototipo UI/UX
 
-🔗 **Figma:** _[enlace pendiente]_
+🔗 **Figma:** https://www.figma.com/proto/G77aG9gAjBbbbawCKI4ULa/APAR-CAR?node-id=3-466&p=f&t=tBwJtiznu6z6B7De-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1
 
-El prototipo cubre las vistas de la sección 8.
+El prototipo cubre 3 vistas de la sección 8.
 
 ---
 
@@ -435,8 +435,6 @@ Este repositorio es **público**, por exigencia de la competencia. Por eso:
 - Están activados el **escaneo de secretos** y la **protección de push** de GitHub.
 - El historial se revisa antes de cada entrega.
 
-> Pendiente de documentación: actualizar el RNF-10 del backlog, que hoy exige repositorio privado.
-
 ---
 
 ## 14. Documentación del proyecto
@@ -445,7 +443,7 @@ La fuente de verdad de requisitos, historias de usuario, reglas de negocio y dec
 
 | Documento | Ubicación |
 |---|---|
-| Backlog del producto | _[enlace pendiente]_ |
+| Backlog del producto | https://drive.google.com/drive/folders/1xVjThKhRuPzRCG1nq3CUuxKLr0R3-H7u?usp=drive_link |
 | Decisiones de arquitectura (ADR) | Hoja *Decisiones (ADR)* del backlog |
 | Colección de Postman | `docs/postman/` |
 
