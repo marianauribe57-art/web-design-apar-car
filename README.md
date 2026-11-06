@@ -326,6 +326,26 @@ La colección de Postman con todas las rutas se publica en `docs/postman/`.
 | Portal del cliente | Cliente afiliado | Historial del vehículo, estado de la mensualidad y pagos |
 | Consulta de tiquete | Visitante ocasional | Ver tiempo y valor acumulado con el código de entrada |
 
+### Aplicación publicada en Vercel
+
+🌐 **https://web-design-apar-car.vercel.app**
+
+![Panel de control de APAR-CAR publicado en Vercel](docs/capturas/app-vercel.png)
+
+> El esqueleto usa **datos de muestra**; todavía no consulta la base de datos.
+
+**Flujo entre las 3 vistas del esqueleto:**
+
+```mermaid
+flowchart LR
+    P["📊 Panel<br/>/panel<br/>ocupación y vehículos adentro"]
+    D["🔍 Detalle<br/>/movimientos/:id<br/>entrada, salida y valor"]
+    C["⚙️ Configuración<br/>/configuracion<br/>tarifas y estado de las TIC"]
+    P -- "Ver detalle" --> D
+    D -- "Volver al panel" --> P
+    P -- "menú" --> C
+    C -- "menú" --> P
+```
 ---
 
 ## 9. Estructura del repositorio
