@@ -21,3 +21,69 @@ model Usuario {
   activo         Boolean  @default(true)
   creadoEn       DateTime @default(now())
 }
+
+// ─── Entidades del parqueadero ───
+
+enum TipoCelda {
+  CARRO
+  MOTO
+  MIXTA
+}
+
+enum EstadoCelda {
+  LIBRE
+  OCUPADA
+}
+
+enum TipoVehiculo {
+  CARRO
+  MOTO
+}
+
+model Parqueadero {
+  id          String       @id @default(uuid()) @db.Uuid
+  nombre      String
+  direccion   String
+  creadoEn    DateTime     @default(now()) @db.Timestamptz
+  celdas      Celda[]
+  tarifas     Tarifa[]
+  movimientos Movimiento[]
+}
+
+model Celda {
+  id            String       @id @default(uuid()) @db.Uuid
+  parqueaderoId String       @db.Uuid
+  codigo        String
+  tipoPermitido TipoCelda
+  estado        EstadoCelda  @default(LIBRE)
+  parqueadero   Parqueadero  @relation(fields: [parqueaderoId], references: [id])
+  movimientos   Movimiento[]
+
+  @@unique([parqueaderoId, codigo])
+}
+
+model Tarifa {
+  id               String       @id @default(uuid()) @db.Uuid
+  parqueaderoId    String       @db.Uuid
+  valorHora        Decimal      @db.Decimal(10, 2)
+  valorDia         Decimal      @db.Decimal(10, 2)
+  valorMensualidad Decimal      @db.Decimal(10, 2)
+  vigenteDesde     DateTime     @db.Timestamptz
+  vigenteHasta     DateTime?    @db.Timestamptz
+  parqueadero      Parqueadero  @relation(fields: [parqueaderoId], references: [id])
+  movimientos      Movimiento[]
+}
+
+model Movimiento {
+  id            String       @id @default(uuid()) @db.Uuid
+  parqueaderoId String       @db.Uuid
+  celdaId       String       @db.Uuid
+  tarifaId      String       @db.Uuid
+  placa         String
+  tipoVehiculo  TipoVehiculo
+  entradaEn     DateTime     @default(now()) @db.Timestamptz
+  salidaEn      DateTime?    @db.Timestamptz
+  parqueadero   Parqueadero  @relation(fields: [parqueaderoId], references: [id])
+  celda         Celda        @relation(fields: [celdaId], references: [id])
+  tarifa        Tarifa       @relation(fields: [tarifaId], references: [id])
+}
