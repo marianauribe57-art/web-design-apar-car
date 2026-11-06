@@ -4,6 +4,8 @@ import Estacionamientos from './pages/Estacionamientos';
 import NoEncontrada from './pages/NoEncontrada';
 import InicioSesion from './pages/InicioSesion';
 import Panel from './pages/Panel';
+import Detalle from './pages/Detalle';
+import Configuracion from './pages/Configuracion';
 
 function App() {
   return (
@@ -13,7 +15,9 @@ function App() {
 
       <Route element={<LayoutPrincipal />}>
         <Route path="/panel" element={<Panel />} />
+        <Route path="/movimientos/:id" element={<Detalle />} />
         <Route path="/estacionamientos" element={<Estacionamientos />} />
+        <Route path="/configuracion" element={<Configuracion />} />
       </Route>
       <Route path="*" element={<NoEncontrada />} />
     </Routes>

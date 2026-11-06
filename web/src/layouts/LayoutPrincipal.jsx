@@ -3,6 +3,7 @@ import { NavLink, Outlet } from 'react-router';
 const enlaces = [
   { ruta: '/panel', texto: 'Panel de control' },
   { ruta: '/estacionamientos', texto: 'Estacionamientos' },
+  { ruta: '/configuracion', texto: 'Configuración' },
 ];
 
 function LayoutPrincipal() {
