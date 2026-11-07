@@ -312,6 +312,7 @@ La API gestiona más de cuatro recursos. Todos viven bajo `/api` y, salvo la con
 | Tiquete público | `/api/tiquetes/:codigo` | consultar estado del tiquete | Sin sesión (límite por IP) |
 | Lector QR | `/api/lector/lecturas` | recibir lectura del dispositivo | Dispositivo con clave |
 
+
 La colección de Postman con todas las rutas se publica en `docs/postman/`.
 
 ---
