@@ -312,6 +312,19 @@ La API gestiona más de cuatro recursos. Todos viven bajo `/api` y, salvo la con
 | Tiquete público | `/api/tiquetes/:codigo` | consultar estado del tiquete | Sin sesión (límite por IP) |
 | Lector QR | `/api/lector/lecturas` | recibir lectura del dispositivo | Dispositivo con clave |
 
+### Endpoints por vista
+
+Qué endpoints alimentan cada una de las 3 vistas del esqueleto. Hoy solo existe `/api/health`; el resto está planeado y las vistas usan datos de muestra.
+
+| Vista | Endpoint | Para qué | Estado |
+|---|---|---|---|
+| 📊 Panel | `GET /api/celdas` | Celdas y ocupación | 🟡 Planeado |
+| 📊 Panel | `GET /api/movimientos?abiertos=true` | Vehículos que están adentro | 🟡 Planeado |
+| 🔍 Detalle | `GET /api/movimientos/:id` | Entrada, salida y valor de un movimiento | 🟡 Planeado |
+| 🔍 Detalle | `POST /api/movimientos/:id/salida` | Registrar la salida y el cobro | 🟡 Planeado |
+| ⚙️ Configuración | `GET /api/tarifas/vigente` | Tarifas actuales | 🟡 Planeado |
+| ⚙️ Configuración | `POST /api/tarifas` | Crear una nueva versión de tarifas | 🟡 Planeado |
+| ⚙️ Configuración | `GET /api/health` | Estado del servidor y de las herramientas TIC | ✅ Implementado |
 La colección de Postman con todas las rutas se publica en `docs/postman/`.
 
 ---
@@ -443,6 +456,10 @@ NODE_ENV=development
 🔗 **Figma:** https://www.figma.com/proto/G77aG9gAjBbbbawCKI4ULa/APAR-CAR?node-id=3-466&p=f&t=tBwJtiznu6z6B7De-1&scaling=min-zoom&content-scaling=fixed&page-id=0%3A1
 
 El prototipo cubre 3 vistas de la sección 8.
+
+| Panel | Detalle | Configuración |
+|---|---|---|
+| ![Panel en Figma](docs/figma/panel.png) | ![Detalle en Figma](docs/figma/detalle.png) | ![Configuración en Figma](docs/figma/configuracion.png) |
 
 ---
 
