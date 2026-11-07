@@ -2,6 +2,9 @@
 
 > Repositorio `web-design-apar-car` · Competencia de Herramientas TIC · SENA, Tecnólogo en Análisis y Desarrollo de Software · Ficha **3229209**
 
+[![CI](https://github.com/marianauribe57-art/web-design-apar-car/actions/workflows/ci.yml/badge.svg)](https://github.com/marianauribe57-art/web-design-apar-car/actions/workflows/ci.yml)
+
+## Elevator Pitch
 
 **APAR-CAR** es una plataforma web para que los dueños de parqueaderos pequeños o comunitarios manejen su negocio en un solo lugar: celdas, tarifas, entradas y salidas con cobro automático, mensualidades, cartera y reportes. El cliente afiliado consulta su historial y el estado de su mensualidad sin tener que preguntarle al administrador.
 
@@ -45,9 +48,11 @@ El proyecto integra **tres herramientas TIC**. Las tres ya estaban decididas en 
 
 | # | Herramienta | Para qué la usamos | Dónde se ve en el proyecto | Respaldo documental |
 |---|---|---|---|---|
-| 1 | **GitHub Actions** | Ejecutar ESLint, Prettier y Vitest en cada push y en cada Pull Request; bloquear el *merge* si algo falla. | `.github/workflows/ci.yml` y la pestaña *Checks* de cada PR | ADR-008, HT-05 |
-| 2 | **Vercel** | Desplegar automáticamente el cliente (`web/`) y el servidor (`api/`). Cada PR recibe una URL de vista previa; cada *merge* a `main` publica en producción. | Comentario del bot de Vercel en cada PR | ADR-008, HT-05 |
-| 3 | **Prisma ORM** (gestión de BD) | Definir el modelo de datos como código, versionar las migraciones y consultar PostgreSQL (Neon). Prisma Studio y pgAdmin para inspeccionar los datos. | `api/prisma/schema.prisma` y `api/prisma/migrations/` | ADR-008, HT-06 |
+| 1 | **GitHub Actions** | En cada push y Pull Request: ESLint y build del frontend, instalación del backend y `prisma validate`. Si algo falla, `main` no acepta el *merge*. Prettier y Vitest están planeados. | `.github/workflows/ci.yml` y la pestaña *Checks* de cada PR | ADR-008, HT-05 |
+| 2 | **Vercel** | Desplegar automáticamente el cliente (`frontend/`). Cada PR recibe una URL de vista previa; cada *merge* a `main` publica en producción. El servidor (`backend/`) se desplegará en una fase siguiente. | Comentario del bot de Vercel en cada PR | ADR-008, HT-05 |
+| 3 | **Prisma ORM** (gestión de BD) | Definir el modelo de datos como código, versionar las migraciones y consultar PostgreSQL (Neon). Prisma Studio y pgAdmin para inspeccionar los datos. | `backend/prisma/schema.prisma` y `backend/prisma/migrations/` | ADR-008, HT-06 |
+
+**Diseño:** el prototipo de las 3 vistas se hizo en **Figma** (sección 12).
 
 ---
 
@@ -56,13 +61,13 @@ El proyecto integra **tres herramientas TIC**. Las tres ya estaban decididas en 
 | Capa | Tecnología |
 |---|---|
 | Lenguaje | JavaScript (Node.js 22 LTS) |
-| Cliente | React 18 + Vite + Bootstrap 5 (react-bootstrap) |
-| Servidor | Express |
-| Persistencia | PostgreSQL en Neon + Prisma ORM |
-| Autenticación | express-session (sesión almacenada en PostgreSQL) + bcrypt |
-| Pruebas | Vitest + Supertest · Postman para pruebas manuales |
-| Calidad | ESLint + Prettier + SonarCloud |
-| Despliegue | Vercel (dos proyectos sobre este mismo repositorio) |
+| Cliente | React 19 + Vite 8 + React Router 8 + Bootstrap 5 |
+| Servidor | Express 5 |
+| Persistencia | PostgreSQL en Neon + Prisma ORM 7 |
+| Autenticación | express-session (sesión almacenada en PostgreSQL) + bcrypt · *planeado* |
+| Pruebas | Vitest + Supertest · Postman para pruebas manuales · *planeado* |
+| Calidad | ESLint (activo en el CI) · Prettier y SonarCloud *planeados* |
+| Despliegue | Vercel: cliente publicado hoy; servidor en una fase siguiente |
 
 Toda marca de tiempo se guarda como `timestamptz` en UTC y se convierte a `America/Bogota` solo al mostrarla.
 
@@ -82,14 +87,14 @@ flowchart LR
     end
 
     subgraph NAV["Navegador del usuario"]
-        SPA["CMP-01 · Presentación<br/>SPA React 18 + Vite + Bootstrap 5<br/>enrutamiento por rol"]
+        SPA["CMP-01 · Presentación<br/>SPA React 19 + Vite + Bootstrap 5<br/>enrutamiento por rol"]
     end
 
     LECTOR["EXT-01 · Lector QR<br/>ESP32 + módulo lector"]
 
     subgraph VERCEL["Vercel"]
-        WEB["Proyecto web/<br/>archivos estáticos de la SPA<br/>+ reescritura de /api/*"]
-        subgraph API["Proyecto api/ · Express en función serverless"]
+        WEB["Proyecto frontend/<br/>archivos estáticos de la SPA<br/>+ reescritura de /api/*"]
+        subgraph API["Proyecto backend/ · Express en función serverless"]
             APP["CMP-02 · Aplicación<br/>rutas, controladores, sesión y permisos"]
             DOM["CMP-03 · Dominio<br/>reglas de negocio RN-01 a RN-18"]
             PER["CMP-04 y CMP-05 · Persistencia<br/>Prisma Client con filtro por parqueadero_id"]
@@ -115,12 +120,12 @@ flowchart LR
 
 ## 5. Flujo de integración y despliegue continuo
 
-Así trabajan juntas las tres herramientas TIC desde que alguien abre una rama hasta que el cambio llega a producción. La migración de la base de datos corre dentro del build de producción de `api/`: si falla, Vercel no publica y sigue en línea la versión anterior. Las vistas previas usan una base de datos de desarrollo, nunca la de producción.
+Así trabajan juntas las tres herramientas TIC desde que alguien abre una rama hasta que el cambio llega a producción. La migración de la base de datos correrá dentro del build de producción de `backend/`: si falla, Vercel no publica y sigue en línea la versión anterior. Las vistas previas usan una base de datos de desarrollo, nunca la de producción.
 
 ```mermaid
 flowchart TD
     A["Rama de trabajo<br/>feat/HU-xx-descripcion"] --> B["git push a la rama"]
-    B --> D["GitHub Actions · ci.yml<br/>ESLint · Prettier --check · Vitest + Supertest<br/>análisis SonarCloud"]
+    B --> D["GitHub Actions · ci.yml<br/>ESLint y build del frontend<br/>npm ci + prisma validate del backend"]
     B --> E["Vercel · despliegue de vista previa<br/>con la base de datos de desarrollo"]
     D --> C["Pull Request hacia main<br/>muestra los checks y la URL de vista previa"]
     E --> C
@@ -128,7 +133,7 @@ flowchart TD
     F -- No --> G["Corregir en la misma rama"]
     G --> B
     F -- Sí --> H["Merge a main<br/>rama protegida"]
-    H --> I["Vercel · build de producción de web/ y api/<br/>api/ ejecuta prisma migrate deploy sobre Neon"]
+    H --> I["Vercel · build de producción de frontend/<br/>(backend/ con prisma migrate deploy: planeado)"]
     I --> J{"¿Migración y build<br/>sin errores?"}
     J -- Sí --> K["Producción actualizada"]
     J -- No --> L["Sigue en línea la versión anterior<br/>se corrige con un nuevo PR"]
@@ -325,7 +330,8 @@ Qué endpoints alimentan cada una de las 3 vistas del esqueleto. Hoy solo existe
 | ⚙️ Configuración | `GET /api/tarifas/vigente` | Tarifas actuales | 🟡 Planeado |
 | ⚙️ Configuración | `POST /api/tarifas` | Crear una nueva versión de tarifas | 🟡 Planeado |
 | ⚙️ Configuración | `GET /api/health` | Estado del servidor y de las herramientas TIC | ✅ Implementado |
-La colección de Postman con todas las rutas se publica en `docs/postman/`.
+
+La colección de Postman con todas las rutas se publicará en `docs/postman/` (*planeado*).
 
 ---
 
@@ -366,29 +372,33 @@ flowchart LR
 ```text
 web-design-apar-car/
 ├── .github/
-│   ├── workflows/
-│   │   └── ci.yml               # GitHub Actions: lint + pruebas en cada push y PR
-│   └── pull_request_template.md
-├── api/                         # Servidor Express (proyecto de Vercel #1)
+│   └── workflows/
+│       └── ci.yml               # GitHub Actions: lint, build y prisma validate en cada push y PR
+├── backend/                     # Servidor Express 5
 │   ├── prisma/
 │   │   ├── schema.prisma        # Modelo de datos (sección 6)
-│   │   └── migrations/
+│   │   └── migrations/          # Migración init
 │   ├── src/
-│   │   ├── aplicacion/          # rutas y controladores
-│   │   ├── dominio/             # reglas de negocio
-│   │   └── persistencia/        # acceso a datos con Prisma
-│   ├── tests/
+│   │   ├── config/              # cliente de Prisma
+│   │   ├── routes/              # rutas (hoy: /api/health)
+│   │   ├── controllers/
+│   │   ├── services/
+│   │   ├── repositories/
+│   │   ├── app.js
+│   │   └── server.js
+│   ├── prisma7.config.ts
 │   ├── .env.example
 │   └── package.json
-├── web/                         # Cliente React + Vite (proyecto de Vercel #2)
+├── frontend/                    # Cliente React 19 + Vite (publicado en Vercel)
 │   ├── src/
-│   │   ├── vistas/
-│   │   ├── componentes/
-│   │   └── servicios/           # cliente HTTP con credenciales de sesión
-│   ├── vercel.json              # redirección de /api/* hacia el servidor
+│   │   ├── pages/               # Panel, Detalle, Configuración y otras
+│   │   ├── layouts/             # menú principal
+│   │   └── datos/               # datos de muestra
+│   ├── vercel.json              # todas las rutas van a index.html (React Router)
 │   └── package.json
 ├── docs/
-│   └── postman/
+│   ├── capturas/                # app en Vercel y Prisma Studio
+│   └── figma/                   # prototipo de las 3 vistas
 └── README.md
 ```
 
@@ -400,37 +410,35 @@ web-design-apar-car/
 
 ```bash
 # 1. Clonar
-git clone https://github.com/USUARIO/web-design-apar-car.git
+git clone https://github.com/marianauribe57-art/web-design-apar-car.git
 cd web-design-apar-car
 
 # 2. Servidor
-cd api
+cd backend
 cp .env.example .env          # completar los valores
 npm install
 npx prisma migrate dev        # crea las tablas
 npm run dev                   # http://localhost:3000
 
 # 3. Cliente (en otra terminal)
-cd web
+cd frontend
 npm install
 npm run dev                   # http://localhost:5173
 ```
 
-**Variables de entorno** (`api/.env.example`, sin valores reales):
+**Variables de entorno** (`backend/.env.example`, sin valores reales):
 
 ```env
-DATABASE_URL=
-SESSION_SECRET=
-CLIENT_ORIGIN=http://localhost:5173
-NODE_ENV=development
+PORT=3000
+DATABASE_URL="postgresql://usuario:contrasena@servidor/basededatos"
 ```
 
 | Comando | Qué hace |
 |---|---|
-| `npm run lint` | Revisa el código con ESLint |
-| `npm run format` | Formatea con Prettier |
-| `npm test` | Corre las pruebas con Vitest |
-| `npx prisma studio` | Abre el visor de datos de Prisma |
+| `npm run lint` (en `frontend/`) | Revisa el código con ESLint |
+| `npm run build` (en `frontend/`) | Genera la versión de producción |
+| `npx prisma validate` (en `backend/`) | Revisa que el esquema esté bien escrito |
+| `npx prisma studio` (en `backend/`) | Abre el visor de datos de Prisma |
 
 ---
 
@@ -438,6 +446,7 @@ NODE_ENV=development
 
 - **`main`** es la rama de producción y está **protegida**: no se hace push directo.
 - Todo cambio entra por **Pull Request** con **una aprobación** de otro integrante y los **checks de GitHub Actions en verde**.
+- Al fusionar se usa **Create a merge commit** (nunca *Squash*), para conservar los commits de cada integrante.
 - Nombre de ramas: `tipo/HU-xx-descripcion-corta`.
 
 | Prefijo | Uso | Ejemplo |
@@ -482,10 +491,10 @@ La fuente de verdad de requisitos, historias de usuario, reglas de negocio y dec
 |---|---|
 | Backlog del producto | https://drive.google.com/drive/folders/1xVjThKhRuPzRCG1nq3CUuxKLr0R3-H7u?usp=drive_link |
 | Decisiones de arquitectura (ADR) | Hoja *Decisiones (ADR)* del backlog |
-| Colección de Postman | `docs/postman/` |
+| Colección de Postman | `docs/postman/` (*planeado*) |
 
 ---
 
 ## 15. Video de presentación
 
-🎥 _[enlace pendiente]_ · Máximo 5 minutos, con la participación de los tres integrantes explicando la integración de las herramientas TIC.
+🎥 **[Ver el video](https://drive.google.com/file/d/15W8nWa3B-BmR4LpMkXt9Xr0-0dIv3kSA/view?usp=drive_link)** · Máximo 5 minutos, con la participación de los tres integrantes explicando la integración de las herramientas TIC.
