@@ -444,6 +444,10 @@ NODE_ENV=development
 
 El prototipo cubre 3 vistas de la sección 8.
 
+| Panel | Detalle | Configuración |
+|---|---|---|
+| ![Panel en Figma](docs/figma/panel.png) | ![Detalle en Figma](docs/figma/detalle.png) | ![Configuración en Figma](docs/figma/configuracion.png) |
+
 ---
 
 ## 13. Seguridad del repositorio
